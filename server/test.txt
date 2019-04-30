@@ -1,0 +1,7 @@
+Display Hello World everyone
+Promot the user for number 1
+Save input to num1
+Promot the user for number 2
+Save input to num2
+Sum = num1 + num2
+print Sum
