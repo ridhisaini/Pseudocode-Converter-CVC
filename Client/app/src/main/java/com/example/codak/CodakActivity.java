@@ -92,23 +92,7 @@ public class CodakActivity extends AppCompatActivity
             }
         }
     }
-
-    public static String getFilePath(Context ctx, Uri uri)
-    {
-        ContentResolver cr = ctx.getContentResolver();
-        String file_path = null;
-        Cursor cursor = cr.query(uri,
-                new String[] { android.provider.MediaStore.MediaColumns.DATA },
-                null, null, null);
-        if (cursor != null) {
-            cursor.moveToFirst();
-            file_path = cursor.getString(0);
-            cursor.close();
-        } else {
-            file_path = uri.getPath();
-        }
-        return file_path;
-    }
+    
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
