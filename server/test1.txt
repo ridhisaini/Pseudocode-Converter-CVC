@@ -1,0 +1,14 @@
+initialize Fahrenheit to zeros
+for Celsius = 0 to 29 do
+Fahrenheit[Celsius] = Celsius * 9/5 + 32 
+if Celsius equal 0
+print "tempreture is" , Celsius , "its cold"
+elseif Celsius equal 29
+print "tempreture is" , Celsius , "its hot"
+else
+print "tempreture is" , Celsius , "cool"
+endif
+
+
+
+
