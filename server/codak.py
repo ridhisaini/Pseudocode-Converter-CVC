@@ -188,7 +188,12 @@ def compile_sudo (input_ , result, exec_file):
     exec_file.close()
     return result
 
-
+# Convert sudo code
+    input_file = open("sudo.txt" , "r+")
+    output_file = open("result.txt" , "w+")
+    exec_file = open("exec.txt" , "w+")
+    print('Start compilation')
+    compile_sudo(input_file,  output_file , exec_file)
 
 #Conversion Process
 
