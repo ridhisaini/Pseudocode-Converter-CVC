@@ -188,9 +188,20 @@ def compile_sudo (input_ , result, exec_file):
     exec_file.close()
     return result
 
-# Convert sudo code
-input_file = open("test1.txt" , "r+")
-output_file = open("result.txt" , "w+")
-exec_file = open("exec.txt" , "w+")
-print('Start compilation')
-compile_sudo(input_file,  output_file , exec_file)
+
+
+#Conversion Process
+
+def threaded(c,addr):
+    # Recieve image from client
+    with open('input.jpg', 'wb') as img:
+        data = c.recv(1024)
+        while data != b'done':
+            print(data)
+            img.write(data)
+            data = c.recv(1024)
+    print ('image is recieved!')
+
+
+
+
