@@ -1,7 +1,6 @@
 package com.example.codak;
 
 import android.Manifest;
-
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -10,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -17,9 +17,18 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.net.Socket;
+
+import id.zelory.compressor.Compressor;
 
 public class CodakActivity extends AppCompatActivity
 {
@@ -27,6 +36,14 @@ public class CodakActivity extends AppCompatActivity
     private static final int IMAGE_CAPTURE_CODE = 1001;
     Button mCaptureBtn;
     Uri image_uri;
+    byte[] image_buffer = new byte[1024];
+    FileInputStream fis = null;
+    public static String outputfile_path;
+
+    public static Socket client= null;
+    public static FileOutputStream fos = null;
+    public static DataOutputStream dos = null;
+    public static DataInputStream dis = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -92,13 +109,83 @@ public class CodakActivity extends AppCompatActivity
             }
         }
     }
-    
+
+    public static String getFilePath(Context ctx, Uri uri)
+    {
+        ContentResolver cr = ctx.getContentResolver();
+        String file_path = null;
+        Cursor cursor = cr.query(uri,
+                new String[] { android.provider.MediaStore.MediaColumns.DATA },
+                null, null, null);
+        if (cursor != null) {
+            cursor.moveToFirst();
+            file_path = cursor.getString(0);
+            cursor.close();
+        } else {
+            file_path = uri.getPath();
+        }
+        return file_path;
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //called when image was captured from camera
 
-        if (resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK)
+        {
+            thread.start();
         }
     }
+
+
+    Thread thread = new Thread(new Runnable()
+    {
+        @Override
+        public void run() {
+            try {
+                String ServerIP = "192.168.1.4";
+                int PortNumber = 12346;
+
+                // Connection with server
+                Socket client = null;
+                client = new Socket(ServerIP, PortNumber);
+                dos = new DataOutputStream(client.getOutputStream());
+                dis = new DataInputStream(client.getInputStream());
+
+                // Read image
+                String file_path = getFilePath(getBaseContext(), image_uri);
+                File image = new File(file_path);
+                File compressedImageFile = new Compressor(getBaseContext()).compressToFile(image);
+                FileInputStream fis = new FileInputStream(compressedImageFile);
+
+                // Send image to server
+                while (fis.read(image_buffer) != -1)
+                {
+                    dos.write(image_buffer);
+                    dos.flush();
+                }
+
+                byte[] end = "done".getBytes();
+                dos.write(end);
+
+                // Receive output from server
+                outputfile_path = Environment.getExternalStorageDirectory()+"/output.txt";
+                File output = new File (outputfile_path);
+                fos = new FileOutputStream(output);
+                byte[] buffer = new byte[4096];
+                dis.read(buffer);
+                fos.write(buffer);
+                fos.flush();
+                fos.close();
+
+                Intent intent = new Intent(getBaseContext(), view_output.class);
+                startActivity(intent);
+            }
+
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    });
 }
