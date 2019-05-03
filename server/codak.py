@@ -188,15 +188,8 @@ def compile_sudo (input_ , result, exec_file):
     exec_file.close()
     return result
 
-# Convert sudo code
-    input_file = open("sudo.txt" , "r+")
-    output_file = open("result.txt" , "w+")
-    exec_file = open("exec.txt" , "w+")
-    print('Start compilation')
-    compile_sudo(input_file,  output_file , exec_file)
 
 #Conversion Process
-
 def threaded(c,addr):
     # Recieve image from client
     with open('input.jpg', 'wb') as img:
@@ -206,6 +199,28 @@ def threaded(c,addr):
             img.write(data)
             data = c.recv(1024)
     print ('image is recieved!')
+
+    # Convert sudo code
+    input_file = open("sudo.txt" , "r+")
+    output_file = open("result.txt" , "w+")
+    exec_file = open("exec.txt" , "w+")
+    print('Start compilation')
+    compile_sudo(input_file,  output_file , exec_file)
+
+    # Send output to client
+    print("Beginning File Transfer")
+    f = open("result.txt", 'rb')
+    c.send(f.read(4096))
+    f.close()
+    print("Transfer Complete")
+
+    # Execute Code
+    run = c.recv(1024)
+    if (run== b'run'):
+        exec(open(exec_file.name).read())
+
+    #close socket
+    c.close()
 
 
 
