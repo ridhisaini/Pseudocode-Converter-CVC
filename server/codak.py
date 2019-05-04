@@ -5,36 +5,25 @@ import matplotlib as plt
 import os
 
 def extract_text(img):
-
-    image = cv2.imread('tt3.JPG')
-    #image = cv2.resize(image,(900,900))
-    cv2.imshow("original image",image)
-    cv2.waitKey(0)
-    img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-
-    cv2.imshow("image",img)
-    cv2.waitKey(0)
-
-    #val,gray = cv2.threshold(img, 150, 255,cv2.THRESH_BINARY )
-
-    gray = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,7,4)
-    cv2.imshow("gray",gray)
-    cv2.waitKey(0)
-
-    blur = cv2.GaussianBlur(gray,(5,5),0)
-    cv2.imshow("blur",blur)
-    cv2.waitKey(0)
-
-    val,gray = cv2.threshold(blur, 150, 255,cv2.THRESH_BINARY )
-    cv2.imshow("blur",gray)
-    cv2.waitKey(0)
-
-    cv2.destroyAllWindows()
-    text = pytesseract.image_to_string(img)
-    print(text)
-    f= open("output.txt","w+")
+    img = cv2.resize(img,(1000,1000))
+    img = np.array(img,np.uint8)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    blur = cv2.GaussianBlur(gray,(11,11),0)
+    canny = cv2.Canny(blur, 50, 200)
+    pts = np.argwhere(canny>0)
+    y1,x1 = pts.min(axis=0)
+    y2,x2 = pts.max(axis=0)
+    tagged = cv2.rectangle(gray.copy(), (x1-25,y1-25), (x2+10,y2+10), (0,255,0), 3, cv2.LINE_AA)
+    r = cv2.selectROI(tagged)
+    imCrop = gray[int(r[1]):int(r[1]+r[3]), int(r[0]):int(r[0]+r[2])]
+    imCrop=cv2.GaussianBlur(imCrop,(7,7),0)
+    val,binary = cv2.threshold(imCrop,0,255,cv2.THRESH_BINARY,cv2.THRESH_OTSU)
+    text = pytesseract.image_to_string(binary)
+    f = open("sudo.txt","w+")
     f.write(text)
-    f.close() 
+    f.close()
+    cv2.destroyAllWindows()
+    
 
 
 key_word={"Display":"print","Promot":"input()","print":"print"}
