@@ -40,12 +40,6 @@ string_operations={"add":"+","sub":"-","mul":"*","div":"/","mod":"%" ,"equal" : 
 operations = ["+" , "-" , "*" , "/"] 
 key=["number","string","to","do"]
 
-key_word={"Display":"print","Promot":"input()","print":"print"}
-string_operations={"add":"+","sub":"-","mul":"*","div":"/","mod":"%" ,"equal" : "=" , "greater_than" : ">" ,"less_than" : "<","greater_than_or_equal" : ">=",
-                   "less_than_or_equal" : "=<" ,"not_equal":"!="}
-operations = ["+" , "-" , "*" , "/"] 
-key=["number","string","to","do"]
-
 # compiler function to python code
 """ arguments -->
     input_ : this is the input file of sudocode resulted from preprocessing stage
