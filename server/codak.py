@@ -1,31 +1,35 @@
+    
 import pytesseract
 import cv2
 from PIL import Image
 import matplotlib as plt
+import numpy as np
+import socket
 import os
+from _thread import *
+
+
+# Extract text from image
+#please check your path of tesseract.exe on your machine 
+pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+tessdata_dir_config = r'--tessdata-dir "C:\\Program Files\\Tesseract-OCR\\tessdata"'
+
+"""this function to extract text from the input image ,
+   after resizing it and connvert it to grayscale ,
+   then threshold it using binary thresholding and otsu ,
+   then extract the text using tesseract """
 
 def extract_text(img):
-<<<<<<< HEAD
     img = cv2.resize(img,(1000,1000))
     img = np.array(img,np.uint8)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blur = cv2.GaussianBlur(gray,(11,11),0)
-    canny = cv2.Canny(blur, 50, 200)
-    pts = np.argwhere(canny>0)
-    y1,x1 = pts.min(axis=0)
-    y2,x2 = pts.max(axis=0)
-    tagged = cv2.rectangle(gray.copy(), (x1-25,y1-25), (x2+10,y2+10), (0,255,0), 3, cv2.LINE_AA)
-    r = cv2.selectROI(tagged)
-    imCrop = gray[int(r[1]):int(r[1]+r[3]), int(r[0]):int(r[0]+r[2])]
-    imCrop=cv2.GaussianBlur(imCrop,(7,7),0)
-    val,binary = cv2.threshold(imCrop,0,255,cv2.THRESH_BINARY,cv2.THRESH_OTSU)
-    text = pytesseract.image_to_string(binary)
+    val,binary = cv2.threshold(gray,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    text = pytesseract.image_to_string(Image.fromarray(binary),lang='eng',config=tessdata_dir_config)
+    
+    #sudo.txt file will have the code from the input image
     f = open("sudo.txt","w+")
     f.write(text)
     f.close()
-    cv2.destroyAllWindows()
-    
-=======
 
     image = cv2.imread('tt3.JPG')
     #image = cv2.resize(image,(900,900))
@@ -56,7 +60,8 @@ def extract_text(img):
     f= open("output.txt","w+")
     f.write(text)
     f.close() 
->>>>>>> fb0bf05a2ac3b6eb6620deb20c98b06138716265
+
+
 
 
 key_word={"Display":"print","Promot":"input()","print":"print"}
@@ -260,6 +265,10 @@ def threaded(c,addr):
             img.write(data)
             data = c.recv(1024)
     print ('image is recieved!')
+
+    # Extract text from image
+    img = cv2.imread('input.jpg')
+    extract_text(img)
 
     # Convert sudo code
     input_file = open("sudo.txt" , "r+")
