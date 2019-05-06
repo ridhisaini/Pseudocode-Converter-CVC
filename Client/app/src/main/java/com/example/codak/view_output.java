@@ -42,8 +42,92 @@ public class view_output extends AppCompatActivity
         }
     }
 
+    Thread thread = new Thread(new Runnable()
+    {
+        @Override
+        public void run() {
+            try {
+                ll = (LinearLayout) findViewById(R.id.ll);
+                final LayoutParams lp = new LinearLayout.LayoutParams(
+                        LayoutParams.WRAP_CONTENT, // Width of TextView
+                        LayoutParams.WRAP_CONTENT); // Height of TextView
+                lp.setMargins(10,10,10,10);
+
+                CodakActivity.dos.write("run".getBytes());
+                byte[] in_b = new byte[500];
+                String in;
+
+                int size = CodakActivity.dis.read(in_b);
+                in = new String(in_b, 0, size, "UTF-8");
+                CodakActivity.dos.write("-1".getBytes());
+
+                while (!in.equals("end")) {
+                    final String finalIn = in;
+                    Log.w("Tag",finalIn);
+                    runOnUiThread(new Runnable() {
+                        @SuppressLint("ResourceAsColor")
+                        public void run() {
+                            if (finalIn.equals("input"))
+                            {
+                                final EditText et = new EditText(getBaseContext());
+                                et.setLayoutParams(lp);
+                                et.setTextSize(15f);
+                                et.setTextColor(R.color.silver);
+                                et.setBackgroundResource(R.color.white);
+                                et.setSelection(0);
+                                et.setHint("Enter input");
+                                ll.addView(et);
+
+
+                                Button ok = new Button(getBaseContext());
+                                ok.setLayoutParams(lp);
+                                ok.setText("Send");
+                                ok.setTextSize(15f);
+                                ok.setTextColor(Color.WHITE);
+                                ok.setBackgroundResource(R.color.ko7ly);
+                                ll.addView(ok);
+                                ok.setOnClickListener(new View.OnClickListener() {
+                                    public void onClick(View v) {
+                                        String input = et.getText().toString();
+                                        try {
+                                            CodakActivity.dos.write(input.getBytes());
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                });
+
+                            }
+                            else
+                                {
+                                TextView tv = new TextView(getBaseContext());
+                                tv.setLayoutParams(lp);
+                                tv.setTextSize(15f);
+                                tv.setTextColor(R.color.silver);
+                                tv.setText(finalIn);
+                                ll.addView(tv);
+                            }
+                        }
+                    });
+
+                    in_b = new byte[500];
+                    size = CodakActivity.dis.read(in_b);
+                    in = new String(in_b, 0, size, "UTF-8");
+                    CodakActivity.dos.write("-1".getBytes());
+                }
+                CodakActivity.client.close();
+            }
+
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    });
+
     public void execute(View v)
     {
         output.setVisibility(View.VISIBLE);
+        thread.start();
     }
 }
