@@ -1,4 +1,3 @@
-    
 import pytesseract
 import cv2
 from PIL import Image
@@ -30,39 +29,16 @@ def extract_text(img):
     f = open("sudo.txt","w+")
     f.write(text)
     f.close()
+ 
+# Convert Sudo Code
 
-    image = cv2.imread('tt3.JPG')
-    #image = cv2.resize(image,(900,900))
-    cv2.imshow("original image",image)
-    cv2.waitKey(0)
-    img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+# dictionaries to convert inputes to its equivalents in python 
 
-    cv2.imshow("image",img)
-    cv2.waitKey(0)
-
-    #val,gray = cv2.threshold(img, 150, 255,cv2.THRESH_BINARY )
-
-    gray = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,7,4)
-    cv2.imshow("gray",gray)
-    cv2.waitKey(0)
-
-    blur = cv2.GaussianBlur(gray,(5,5),0)
-    cv2.imshow("blur",blur)
-    cv2.waitKey(0)
-
-    val,gray = cv2.threshold(blur, 150, 255,cv2.THRESH_BINARY )
-    cv2.imshow("blur",gray)
-    cv2.waitKey(0)
-
-    cv2.destroyAllWindows()
-    text = pytesseract.image_to_string(img)
-    print(text)
-    f= open("output.txt","w+")
-    f.write(text)
-    f.close() 
-
-
-
+key_word={"Display":"print","Promot":"input()","print":"print"}
+string_operations={"add":"+","sub":"-","mul":"*","div":"/","mod":"%" ,"equal" : "=" , "greater_than" : ">" ,"less_than" : "<","greater_than_or_equal" : ">=",
+                   "less_than_or_equal" : "=<" ,"not_equal":"!="}
+operations = ["+" , "-" , "*" , "/"] 
+key=["number","string","to","do"]
 
 key_word={"Display":"print","Promot":"input()","print":"print"}
 string_operations={"add":"+","sub":"-","mul":"*","div":"/","mod":"%" ,"equal" : "=" , "greater_than" : ">" ,"less_than" : "<","greater_than_or_equal" : ">=",
@@ -76,7 +52,6 @@ key=["number","string","to","do"]
     result : the output file which contains python code will be appear to the user and comiled
     exec_file : this file contains the code will send to the client from server in the background
     """
-
 def compile_sudo (input_ , result, exec_file):
     indent = 0
     text = input_.readline().rstrip('\n')
@@ -256,6 +231,7 @@ def compile_sudo (input_ , result, exec_file):
 
 
 #Conversion Process
+
 def threaded(c,addr):
     # Recieve image from client
     with open('input.jpg', 'wb') as img:
@@ -291,7 +267,28 @@ def threaded(c,addr):
 
     #close socket
     c.close()
+    
 
+# Main Function
 
+def Main():
+    # Create a Server Socket
+    server = socket.socket()
+    host= socket.gethostbyname(socket.gethostname()) 
+    port = 12346
+    server.bind((host, port))
+    print(host)
+    # Wait for client connection
+    server.listen()
+    while True:
+        print ('Server is waiting..')
+        client, addr = server.accept()
+        
+        print ('Got connection from', addr)
 
+        # Start new thread
+        start_new_thread(threaded, (client,addr,))
 
+    server.close()
+
+Main() 
