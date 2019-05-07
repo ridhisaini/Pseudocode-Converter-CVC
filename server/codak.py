@@ -1,7 +1,5 @@
 import pytesseract
 import cv2
-from PIL import Image
-import matplotlib as plt
 import numpy as np
 import socket
 import os
@@ -178,7 +176,7 @@ def compile_sudo (input_ , result, exec_file):
                 exec_file.write("for %s in range (%s,%d) :\r\n" %( iterator ,(text_list[item-1]),(int(text_list[item+1])+1)))
                 
         #this is for if condition and support nested ifs inside it
-        elif ((text_list[0]) == ("if")) or ((text_list[0]) == ("elseif")) or ((text_list[0]) == ("elif")) or ((text_list[0]) == ("while")) :
+        elif ((text_list[0]) == ("if")) or ((text_list[0]) == ("elseif")) or ((text_list[0]) == ("elif")) :
             
             indent =  indent + 1    #increase the indent counter after for statement
             #execlude to and is from input sudo statement
@@ -189,7 +187,7 @@ def compile_sudo (input_ , result, exec_file):
             # this to handle if the user want to write math operators in english words 
             if([i for i in string_operations if i in text_list]):
                 item = next(i for i in text_list if i in string_operations)
-                if item == "equal" :
+                if item == "=" :
                     text_list[text_list.index(item)] = string_operations[item]+string_operations[item]
                 else :
                     text_list[text_list.index(item)] = string_operations[item]
