@@ -187,7 +187,7 @@ def compile_sudo (input_ , result, exec_file):
             # this to handle if the user want to write math operators in english words 
             if([i for i in string_operations if i in text_list]):
                 item = next(i for i in text_list if i in string_operations)
-                if item == "=" :
+                if item == "equal" :
                     text_list[text_list.index(item)] = string_operations[item]+string_operations[item]
                 else :
                     text_list[text_list.index(item)] = string_operations[item]
