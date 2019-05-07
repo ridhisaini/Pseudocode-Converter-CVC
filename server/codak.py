@@ -46,7 +46,8 @@ key=["number","string","to","do"]
     """
 def compile_sudo (input_ , result, exec_file):
     indent = 0
-    text = input_.readline().rstrip('\n')
+    #read the file and extract extra enter at the end (\n) from it using .rstrip
+    text = input_.readline().rstrip('\n') 
     while text:        
         text_list = text.split()
         if ((text_list[0]) == ("endfor")) or ((text_list[0]) == ("endif")) :
